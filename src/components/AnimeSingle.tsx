@@ -1,39 +1,50 @@
-"use client"
+"use client";
 
-import Image from "next/image"
-import { Card, CardContent, CardFooter } from "./ui/card"
-import Link from "next/link"
+import Image from "next/image";
+import Link from "next/link";
 
-export const AnimeSingle = ({ data }: any) => {
-	return (
-		<div className="w-full h-full ">
-			<div>
-				<Card className="w-fit">
-					<CardContent>
-						<Image
-							src={"https://playmax.mn/" + data?.image}
-							alt={data.title}
-							objectFit="contain"
-							width={300}
-							height={250}
-							priority
-						/>
-					</CardContent>
-					<CardFooter className="flex justify-between flex-col">
-						<Link
-							href={
-								data.vid1 === null
-									? `/more/${data?.id}`
-									: data.vid1
-									? `/movie/${data.id}`
-									: `/anime/${data.id}`
-							}>
-							<h1 className="font-bold">{data.title}</h1>
-							<h1 className="">Episodes: {data.total_episode}</h1>
-						</Link>
-					</CardFooter>
-				</Card>
-			</div>
-		</div>
-	)
+interface AnimeCardProps {
+  data: {
+    id: string;
+    title: string;
+    image: string;
+    total_episode: number;
+    vid1?: string | null;
+  };
 }
+
+export const AnimeSingle = ({ data }: AnimeCardProps) => {
+  console.log(data, "data");
+  return (
+    <div className="relative w-full ">
+      <div className="flex justify-center relative hover:z-[210] z-0">
+        <div className=" relative group-hover:z-[210]  w-full h-[350px] rounded-lg overflow-hidden transition-transform duration-300 group-hover:scale-105">
+          <Link
+            href={
+              data.vid1 === null
+                ? `/more/${data?.id}`
+                : data.vid1
+                ? `/movie/${data.id}`
+                : `/anime/${data.id}`
+            }
+            key={data?.id}
+          >
+            <Image
+              src={`https://playmax.mn/${data?.image}`}
+              alt={data?.title}
+              layout="fill"
+              objectFit="cover"
+              className="group-hover:brightness-75 transition-all group-hover:z-[210]"
+              loading="lazy"
+            />
+            <div className="hidden group-hover:absolute group-hover:flex inset-0 group-hover:z-[210] transition-all duration-300 ease-in-out group-hover:brightness-[300]  items-end bg-gradient-to-t from-black/80 to-transparent p-4">
+              <h3 className="text-white text-lg font-bold drop-shadow-2xl">
+                {data?.title}
+              </h3>
+            </div>
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+};

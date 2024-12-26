@@ -1,11 +1,9 @@
-import { HomePage } from "@/components/HomePage"
-import { InputOTPForm } from "@/components/InputOtp"
-import { ModeToggle } from "@/components/ToggleTheme"
+import { HomePage } from "@/components/HomePage";
 
-export default async function Index() {
-	return (
-		<div className="w-full h-full">
-			<HomePage />
-		</div>
-	)
+export default async function SearchPage() {
+  return (
+    <div className="w-full h-screen overflow-scroll scrollbar-hide">
+      <HomePage />
+    </div>
+  );
 }

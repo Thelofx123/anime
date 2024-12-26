@@ -1,97 +1,125 @@
-"use client"
-import { BellIcon, CheckCircledIcon, CheckIcon } from "@radix-ui/react-icons"
-
-import { Button } from "@/components/ui/button"
+"use client";
+import { CheckCircledIcon } from "@radix-ui/react-icons";
+import { Button } from "@/components/ui/button";
 import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardFooter,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card"
-import { DrawerDemo } from "./Qpay"
-import { useState } from "react"
-import { checkout } from "@/actions/checkout"
-import { useRouter } from "next/navigation"
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { checkout } from "@/actions/checkout";
+import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { DrawerDemo } from "./Qpay";
 
-export function ListOfWallet({ className, data }: any) {
-	const [selectedList, setSelectedList] = useState<any>(null)
-	const [qpayData, setQpayData] = useState<any>(null)
-	const [open, setOpen] = useState(false)
-	const [bill, setBill] = useState<any>(null)
-	const router = useRouter()
+interface ListOfWalletProps {
+  className?: string;
+  data: any[];
+}
 
-	const checkoutGenerate = async (item: any) => {
-		const id = localStorage.getItem("userId")
+interface WalletItem {
+  id: string;
+  title: string;
+  length: number;
+  price: number;
+}
 
-		if (id === null) {
-			alert("Та эхлээд нэвтэрнэ үү")
-			router.push("/login")
-		}
-		setSelectedList(item)
-		if (item.id === undefined) return
-		const data = await checkout(id, item?.id)
-		setQpayData(data?.data)
-		setBill(data?.bill)
-		setOpen(true)
-	}
+// Component
+export function ListOfWallet({ className, data }: ListOfWalletProps) {
+  const [selectedList, setSelectedList] = useState<WalletItem | null>(null);
+  const [isLoading, setIsLoading] = useState<any>(false);
+  const [qpayData, setQpayData] = useState<any>(null);
+  const [open, setOpen] = useState(false);
+  const [bill, setBill] = useState<any>(null);
+  const [userId, setUserId] = useState<string | null>(null);
+  const router = useRouter();
 
-	return (
-		<div className="grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 2xl:grid-cols-4 gap-[20px]">
-			{data &&
-				data.map((item: any, index: number) => {
-					return (
-						<Card className="w-max-[380px] border-[##111111] border-[1px]">
-							<CardHeader>
-								<CardTitle>{item?.title}</CardTitle>
-							</CardHeader>
-							<CardContent className="grid gap-4">
-								<div className="flex gap-4 items-center">
-									<CheckCircledIcon />
-									Анимэ багц
-								</div>
-								<div className="flex gap-4 items-center">
-									<CheckCircledIcon />
-									Кино багц
-								</div>
+  useEffect(() => {
+    const storedId = localStorage.getItem("userId");
+    setUserId(storedId);
+  }, []);
 
-								<div
-									key={index}
-									className="mb-4 grid items-start pb-4 last:mb-0 last:pb-0">
-									<span className="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
-									<div className="space-y-1">
-										<p className="text-sm font-medium leading-none">
-											Хоног - {item?.length} өдөр
-										</p>
-										<p className="text-sm text-muted-foreground">
-											Үнэ - {item?.price}
-										</p>
-									</div>
-								</div>
-							</CardContent>
-							<CardFooter>
-								<Button
-									className="w-full border-[1px] border-[#111] "
-									variant="outline"
-									onClick={() => {
-										checkoutGenerate(item)
-									}}>
-									<p className="text-[#000]">Худалдан авах</p>
-								</Button>
-							</CardFooter>
-						</Card>
-					)
-				})}
+  const checkoutGenerate = async (item: WalletItem) => {
+    if (!userId) {
+      router.push("/login");
+      return;
+    }
 
-			<DrawerDemo
-				qpayData={qpayData}
-				data={selectedList}
-				open={open}
-				setOpen={setOpen}
-				setQpayData={setQpayData}
-				bill={bill}
-			/>
-		</div>
-	)
+    setSelectedList(item);
+
+    if (!item.id) return;
+
+    try {
+      setIsLoading(true);
+      const data = await checkout(userId, item.id);
+      setQpayData(data?.data);
+      setBill(data?.bill);
+      setIsLoading(false);
+      setOpen(true);
+    } catch (error) {
+      console.error("Checkout error:", error);
+      alert("Failed to process checkout. Please try again.");
+    }
+  };
+
+  return (
+    <div
+      className={`grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 2xl:grid-cols-4 gap-5 ${className}`}
+    >
+      {data &&
+        data.map((item, index) => (
+          <Card
+            key={item.id || index}
+            className="w-full max-w-[380px] border-[1px] border-[#111]"
+          >
+            <CardHeader>
+              <CardTitle>{item.title}</CardTitle>
+            </CardHeader>
+            <CardContent className="grid gap-4">
+              <div className="flex gap-4 items-center">
+                <CheckCircledIcon />
+                Анимэ багц
+              </div>
+              <div className="flex gap-4 items-center">
+                <CheckCircledIcon />
+                Кино багц
+              </div>
+              <div className="grid items-start pb-4">
+                <span className="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
+                <div className="space-y-1">
+                  <p className="text-sm font-medium leading-none">
+                    Хоног - {item.length} өдөр
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Үнэ - {item.price}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter>
+              <Button
+                className="w-full border-[1px] border-[#111]"
+                variant="default"
+                disabled={isLoading}
+                onClick={() => checkoutGenerate(item)}
+              >
+                <p className="text-[#000]">
+                  {isLoading ? "Loading..." : "Худалдан авах"}
+                </p>
+              </Button>
+            </CardFooter>
+          </Card>
+        ))}
+
+      <DrawerDemo
+        qpayData={qpayData}
+        data={selectedList}
+        open={open}
+        setOpen={setOpen}
+        setQpayData={setQpayData}
+        bill={bill}
+      />
+    </div>
+  );
 }
