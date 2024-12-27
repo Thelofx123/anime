@@ -20,16 +20,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} `}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <NextUIProvider>
-            <div className="bg-[#161616]">{children}</div>
-          </NextUIProvider>
-        </ThemeProvider>
+        <NextUIProvider>
+          <div className="bg-[#161616] min-h-screen">{children}</div>
+        </NextUIProvider>
       </body>
       <Toaster />
     </html>

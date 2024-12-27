@@ -18,9 +18,9 @@ export async function GET(request: NextRequest) {
   try {
     // Get video URL from query params
     const videoURL = request.nextUrl.searchParams.get("videoUrl");
-
+    console.log(videoURL, "videoURL");
     if (!videoURL) {
-      throw new Error("No video URL provided");
+      throw new Error("WTF");
     }
 
     const range = request.headers.get("range") || "";

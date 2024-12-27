@@ -12,7 +12,7 @@ const COUNTDOWN_DURATION = 5;
 function transformURL(url: string): string {
   if (url.endsWith(".max")) {
     const baseUrl = url.slice(0, -4);
-    return `${baseUrl}.mp4`;
+    return `${baseUrl}.max`;
   }
   const videoApiUrl = `/api/video?videoUrl=${url || ""}`;
   return videoApiUrl;
@@ -31,6 +31,20 @@ function determineType(url: string): string {
     return "dash";
   } else {
     return "normal";
+  }
+}
+
+async function fetchBlob(videoUrl: string) {
+  try {
+    const response = await axios.get(`/api/video?videoUrl=${videoUrl}`, {
+      responseType: "blob",
+    });
+    console.log(response, "response");
+    const blobUrl = URL.createObjectURL(response.data);
+    return blobUrl;
+  } catch (error) {
+    console.error("Failed to fetch video blob:", error);
+    return null;
   }
 }
 
@@ -55,12 +69,11 @@ const initPlayer = (
     },
     data?.vid1 && {
       name: "480p",
-      url: transformURL(data?.vid1 || ""),
+      url: transformURL(transformURL(data?.vid1 || "")),
       type: determineType(transformURL(data?.vid1 || "")),
     },
   ].filter(Boolean);
-
-  console.log(quality, "quality");
+  console.log(data?.vid3 ? 0 : data?.vid2 ? 1 : 2);
   if (playerContainerRef.current) {
     const dp = new DPlayer({
       container: playerContainerRef.current,
@@ -72,16 +85,18 @@ const initPlayer = (
       preload: "auto",
       video: {
         quality: quality,
-        defaultQuality: data?.vid3 ? 0 : data?.vid2 ? 1 : 2,
+        defaultQuality: 0,
         pic: `https://playmax.mn/${data?.image || ""}`,
         customType: {
-          customHls: (video: any) => {
-            if (Hls.isSupported()) {
-              const hls = new Hls();
-              hls.loadSource(videoApiUrl);
-              hls.attachMedia(video);
-              hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
-            }
+          customType: {
+            customHls: (video: any) => {
+              if (Hls.isSupported()) {
+                const hls = new Hls();
+                hls.loadSource(videoApiUrl);
+                hls.attachMedia(video);
+                hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+              }
+            },
           },
         },
       },
@@ -113,7 +128,6 @@ const initPlayer = (
         subtitleContainer.style.maxWidth = "90%";
         subtitleContainer.style.pointerEvents = "none";
 
-        // Append subtitle inside video wrap
         videoWrap.appendChild(subtitleContainer);
       }
     }, 500);
@@ -186,11 +200,13 @@ const PlayerComponent = ({
     }
   };
 
+  console.log(mainData, "mainData");
+
   useEffect(() => {
     fetchEpisodes();
     fetchSubtitle();
   }, [mainData]);
-  console.log(mainData, "mainData");
+
   useEffect(() => {
     const videoApiUrl = transformURL(
       mainData?.vid3 || mainData?.vid2 || mainData?.vid1 || ""

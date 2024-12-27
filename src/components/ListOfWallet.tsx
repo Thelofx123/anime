@@ -71,27 +71,27 @@ export function ListOfWallet({ className, data }: ListOfWalletProps) {
         data.map((item, index) => (
           <Card
             key={item.id || index}
-            className="w-full max-w-[380px] border-[1px] border-[#111]"
+            className="w-full max-w-[380px] border-[1px] border-[#111] bg-[--card-foreground]"
           >
             <CardHeader>
               <CardTitle>{item.title}</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-4">
-              <div className="flex gap-4 items-center">
+              <div className="flex gap-4 items-center text-[--text-primary]">
                 <CheckCircledIcon />
                 Анимэ багц
               </div>
-              <div className="flex gap-4 items-center">
+              <div className="flex gap-4 items-center text-[--text-primary]">
                 <CheckCircledIcon />
                 Кино багц
               </div>
-              <div className="grid items-start pb-4">
+              <div className="grid items-start pb-4 text-[--text-primary]">
                 <span className="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
                 <div className="space-y-1">
-                  <p className="text-sm font-medium leading-none">
+                  <p className="text-sm font-medium leading-none text-[--text-primary]">
                     Хоног - {item.length} өдөр
                   </p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-[--text-primary]">
                     Үнэ - {item.price}
                   </p>
                 </div>
@@ -104,7 +104,7 @@ export function ListOfWallet({ className, data }: ListOfWalletProps) {
                 disabled={isLoading}
                 onClick={() => checkoutGenerate(item)}
               >
-                <p className="text-[#000]">
+                <p className="text-[--text-primary]">
                   {isLoading ? "Loading..." : "Худалдан авах"}
                 </p>
               </Button>

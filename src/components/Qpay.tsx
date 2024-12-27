@@ -54,12 +54,10 @@ export function DrawerDemo({
     });
   };
 
-  console.log(qpayData?.qr_text, "qpayData?.qr_text");
-
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerContent>
-        <div className="mx-auto w-full max-w-sm">
+        <div className="mx-auto w-full max-w-sm ">
           <DrawerHeader>
             <DrawerTitle>{data?.title}</DrawerTitle>
             <DrawerDescription>
